@@ -28,14 +28,14 @@ module Equalizer(clk,RST_n,LED,ADC_SS_n,ADC_MOSI,ADC_SCLK,ADC_MISO,
     /////////////////////////////////////////////////////
 	// Declare wires for internal connection of units //
 	///////////////////////////////////////////////////
-	wire [11:0] POT_LP, POT_B1, POT_B2, POT_B3, POT_HP, VOLUME;
+	wire [11:0] POT_LP, POT_B1, POT_B2, POT_B3, POT_HP, POT_VOL;
 	wire signed [23:0] lft_chnnl_in, rght_chnnl_in;
 	wire signed [15:0] lft_chnnl_out, rght_chnnl_out;
 	wire vld, seq_low;
 	
 
 	  
-	//assign LED = {8'h00};
+	assign LED = {8'h00};
 
 		 
 
@@ -50,12 +50,12 @@ module Equalizer(clk,RST_n,LED,ADC_SS_n,ADC_MOSI,ADC_SCLK,ADC_MISO,
 	////////////////////////////////////					
 	slide_intf iSLD(.clk(clk),.rst_n(rst_n),.SS_n(ADC_SS_n),.MOSI(ADC_MOSI),.MISO(ADC_MISO),
 	                .SCLK(ADC_SCLK),.POT_LP(POT_LP),.POT_B1(POT_B1),.POT_B2(POT_B2),
-					.POT_B3(POT_B3),.POT_HP(POT_HP),.VOLUME(VOLUME));
+					.POT_B3(POT_B3),.POT_HP(POT_HP),.POT_VOL(POT_VOL));
 				  
 	//////////////////////////////////////
 	// Instantiate BT module interface //
 	////////////////////////////////////
-	bt_intf iBT(.clk(clk),.rst_n(rst_n),.next_n(next_n),.prev_n(prev_n),
+	BT_intf iBT(.clk(clk),.rst_n(rst_n),.next_n(next_n),.prev_n(prev_n),
 	            .RX(RX),.TX(TX), .cmd_n(cmd_n));
 					
 			
@@ -69,13 +69,13 @@ module Equalizer(clk,RST_n,LED,ADC_SS_n,ADC_MOSI,ADC_SCLK,ADC_MISO,
     /////////////////////////////////////////////////
     // Instantiate Equalizer Engine or equivalent //
     ///////////////////////////////////////////////	
-	EQ_engine iEQ(.clk(clk),.rst_n(rst_n),.VOLUME(VOLUME),.POT_LP(POT_LP),
+	EQ_engine iEQ(.clk(clk),.rst_n(rst_n),.POT_VOL(POT_VOL),.POT_LP(POT_LP),
 	              .POT_B1(POT_B1),.POT_B2(POT_B2),.POT_B3(POT_B3),.POT_HP(POT_HP),
 			      .aud_in_lft(lft_chnnl_in[23:8]),.aud_out_lft(lft_chnnl_out),
-			      .aud_in_rht(rght_chnnl_in[23:8]),.aud_out_rht(rght_chnnl_out),
-			      .vld(vld),.seq_low(seq_low));
+			      .aud_in_rght(rght_chnnl_in[23:8]),.aud_out_rght(rght_chnnl_out),
+			      .vld(vld));
 				  
-	LED	iLED(.clk(clk),.rst_n(rst_n),.lft(lft_chnnl_out),.rht(rght_chnnl_out),.LED(LED));
+	///LED	iLED(.clk(clk),.rst_n(rst_n),.lft(lft_chnnl_out),.rht(rght_chnnl_out),.LED(LED));
 
 	/////////////////////////////////////
 	// Instantiate PDM speaker driver //
@@ -88,21 +88,21 @@ module Equalizer(clk,RST_n,LED,ADC_SS_n,ADC_MOSI,ADC_SCLK,ADC_MISO,
 	// Infer sht_dwn/Flt_n logic or incorporate into other unit //
 	/////////////////////////////////////////////////////////////
 	logic sht_dwn_temp;
-	logic [???:0] time_cnt; /// TODO
+	logic [17:0] time_cnt;
 	always_ff @(posedge clk, negedge rst_n) begin
 		if(!rst_n) begin
 			sht_dwn_temp <= 1;
 			time_cnt <= 0;
 		end else begin
-			time_cnt <= time_cnt + 1;
-			if(!Flt_n) begin
-				sht_dwn_temp = 1;
-				time_cnt = 0;
-			end
-			if(time_cnt == 5ms) /// TODO
-				sht_dwn_temp <= 0;
-		end
-	end
-	assign sht_dwn = sht_dwn_temp;
+	    	time_cnt <= time_cnt + 1;
+			if(!Flt_n)
+ 				sht_dwn_temp = 1;
+			if(time_cnt == 18'd250000) begin
+ 				sht_dwn_temp <= 0;
+ 				time_cnt <= 0;
+            end
+        end
+    end
+    assign sht_dwn = sht_dwn_temp;
 
 endmodule

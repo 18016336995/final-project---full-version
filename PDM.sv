@@ -61,12 +61,14 @@ always_ff @(posedge clk, negedge rst_n) begin
 end
 
 // FF comes after f = A + B  (B3 = B3 + B2)
+logic [15:0] B4;
 always_ff @(posedge clk, negedge rst_n) begin
    if (!rst_n)
       B3 <= 1'b0;
    else
-      B3 <= B3 + B2;				// accumulator
+      B3 <= B4;				// accumulator
 end
+assign B4 = B3 + B2;
 
 // 2 FFs come after AB comparator
 always_ff @(posedge clk, negedge rst_n) begin

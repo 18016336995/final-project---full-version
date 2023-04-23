@@ -37,13 +37,50 @@ module Equalizer_tb();
 	initial begin
 		clk = 0;
 		RST_n = 0;
-
+		next_n = 1;
+		prev_n = 1;
+		Flt_n = 1;
 
 		@(posedge clk);
         @(negedge clk); /// wait one clock cycle
         RST_n = 1;
+		LP = 12'd4096;
+		B1 = 12'd4096;
+		B2 = 12'd4096;
+		B3 = 12'd4096;
+		HP = 12'd4096;
+		VOL = 12'd4096;
 
 
+		/// go to song 0
+		next_n = 0;
+		repeat (5000) @(posedge clk);
+		next_n = 1;
+		repeat (600000) @(posedge clk);
+		/// song 1
+		next_n = 0;
+		repeat (5000) @(posedge clk);
+		next_n = 1;
+		repeat (600000) @(posedge clk);
+		/// song 2
+		next_n = 0;
+		repeat (5000) @(posedge clk);
+		next_n = 1;
+		repeat (600000) @(posedge clk);
+		/// song 3
+		next_n = 0;
+		repeat (5000) @(posedge clk);
+		next_n = 1;
+		repeat (600000) @(posedge clk);
+		/// go back to song 2
+		prev_n = 0;
+		repeat (5000) @(posedge clk);
+		prev_n = 1;
+		repeat (600000) @(posedge clk);
+		/// shut down
+		Flt_n = 0;
+		repeat (5000) @(posedge clk);
+		$stop();
 	end
 
 	always
