@@ -87,7 +87,21 @@ module Equalizer(clk,RST_n,LED,ADC_SS_n,ADC_MOSI,ADC_SCLK,ADC_MISO,
 	///////////////////////////////////////////////////////////////
 	// Infer sht_dwn/Flt_n logic or incorporate into other unit //
 	/////////////////////////////////////////////////////////////
-	
-
+	logic sht_dwn_temp;
+	logic [???:0] time_cnt; /// TODO
+	always_ff @(posedge clk, negedge rst_n) begin
+		if(!rst_n) begin
+			sht_dwn_temp <= 1;
+			time_cnt <= 0;
+		end else begin
+			time_cnt <= time_cnt + 1;
+			if(!Flt_n) begin
+				sht_dwn_temp = 1;
+				time_cnt = 0;
+			end
+			if(time_cnt == 5ms) /// TODO
+				sht_dwn_temp <= 0;
+		end
+	end
 
 endmodule
