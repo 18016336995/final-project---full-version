@@ -103,5 +103,6 @@ module Equalizer(clk,RST_n,LED,ADC_SS_n,ADC_MOSI,ADC_SCLK,ADC_MISO,
 				sht_dwn_temp <= 0;
 		end
 	end
+	assign sht_dwn = sht_dwn_temp;
 
 endmodule
