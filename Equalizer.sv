@@ -75,7 +75,7 @@ module Equalizer(clk,RST_n,LED,ADC_SS_n,ADC_MOSI,ADC_SCLK,ADC_MISO,
 			      .aud_in_rght(rght_chnnl_in[23:8]),.aud_out_rght(rght_chnnl_out),
 			      .vld(vld));
 				  
-	///LED	iLED(.clk(clk),.rst_n(rst_n),.lft(lft_chnnl_out),.rht(rght_chnnl_out),.LED(LED));
+	//iLED(.clk(clk),.rst_n(rst_n),.lft(lft_chnnl_out),.rht(rght_chnnl_out),.LED(LED));
 
 	/////////////////////////////////////
 	// Instantiate PDM speaker driver //

@@ -31,9 +31,10 @@ module Equalizer_tb();
 	//////////////////////////////////////////////
 	// Instantiate model of A2D and Slide Pots //
 	////////////////////////////////////////////		   
-	A2D_with_Pots iPOTs(.clk(clk),.rst_n(rst_n),.SS_n(ADC_SS_n),.SCLK(ADC_SCLK),.MISO(ADC_MISO),
+	A2D_with_Pots iPOTs(.clk(clk),.rst_n(RST_n),.SS_n(ADC_SS_n),.SCLK(ADC_SCLK),.MISO(ADC_MISO),
 						.MOSI(ADC_MOSI),.LP(LP),.B1(B1),.B2(B2),.B3(B3),.HP(HP),.VOL(VOL));
-				
+
+	
 	initial begin
 		clk = 0;
 		RST_n = 0;
@@ -44,19 +45,16 @@ module Equalizer_tb();
 		@(posedge clk);
         @(negedge clk); /// wait one clock cycle
         RST_n = 1;
-		LP = 12'd4096;
-		B1 = 12'd4096;
-		B2 = 12'd4096;
-		B3 = 12'd4096;
-		HP = 12'd4096;
-		VOL = 12'd4096;
+		LP = 12'd1024;
+		B1 = 12'd0;
+		B2 = 12'd1024;
+		B3 = 12'd0;
+		HP = 12'd1024;
+		VOL = 12'd4095;
 
 
-		/// go to song 0
-		next_n = 0;
-		repeat (5000) @(posedge clk);
-		next_n = 1;
-		repeat (600000) @(posedge clk);
+		
+		repeat (2100000) @(posedge clk);
 		/// song 1
 		next_n = 0;
 		repeat (5000) @(posedge clk);

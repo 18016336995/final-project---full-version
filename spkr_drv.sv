@@ -9,12 +9,16 @@ module spkr_drv(clk,rst_n,vld,lft_chnnl,rght_chnnl,lft_PDM,
   output rght_PDM;
   output lft_PDM_n;
   output rght_PDM_n;
-  
+
+
   
   /////////////////////////////////////////////////////
   // registers to capture chnnl data from EQ engine //
   ///////////////////////////////////////////////////
   reg signed [15:0] lft_reg, rght_reg;
+    logic [15:0] rght_input, lft_input;
+	PDM_decoder iPDM(.clk(clk), .rst_n(rst_n), .lft_PDM(lft_PDM), .rght_PDM(rght_PDM), 
+					.rght_input(rght_input), .lft_input(lft_input));	
   
   ////////////////////////////
   // Infer channel capture //

@@ -129,5 +129,6 @@ module high_freq_queue(clk, rst_n, wrt_smpl, lft_smpl, rght_smpl, lft_out, rght_
             default : nxt_state = IDLE;
         endcase
     end
+   
 
 endmodule

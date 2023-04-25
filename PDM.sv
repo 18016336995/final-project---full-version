@@ -27,24 +27,18 @@ logic AgteB;					// A3 greater or equal to B3
 /////////////////////////////////
 
 // compare A3 and B3
-assign AgteB = (A3 >= B3) ? 1'b1 : 1'b0;
+assign AgteB = (A1 >= B3) ? 1'b1 : 1'b0;
 
 
 //////////////////////////////////////
 ////  Combinational logic block  ////
 ////////////////////////////////////
 
-// Mux of B1 and f = B - A  (B2 = B1 - A1)
-always_comb begin
-   if (AgteB)
-      B1 = 16'hFFFF;
-   else
-      B1 = 16'h0000;
-   B2 = B1 - A1;
-end
+assign B1 = (AgteB)? 16'hFFFF : 0;
+assign B2 = B1 - A1;
 
 
-///////////////////////////////////
+////////////////////////////////////
 ////  Sequential logic block  ////
 /////////////////////////////////
 
@@ -52,23 +46,20 @@ end
 always_ff @(posedge clk, negedge rst_n) begin
    if (!rst_n) begin
       A1 <= 1'b0;
-      A3 <= 1'b0;
    end
-   else begin
+   else if (duty !== 'x)begin
       A1 <= duty;
-      A3 <= duty;
    end
 end
 
+
 // FF comes after f = A + B  (B3 = B3 + B2)
-logic [15:0] B4;
 always_ff @(posedge clk, negedge rst_n) begin
    if (!rst_n)
       B3 <= 1'b0;
    else
-      B3 <= B4;				// accumulator
+      B3 <= B3 + B2;				// accumulator
 end
-assign B4 = B3 + B2;
 
 // 2 FFs come after AB comparator
 always_ff @(posedge clk, negedge rst_n) begin
@@ -76,9 +67,12 @@ always_ff @(posedge clk, negedge rst_n) begin
       PDM <= 1'b0;				// PDM reset to 0
       PDM_n <= 1'b1;			 	// PDM_n preset to 1
    end
-   else begin
-      PDM <= AgteB;
-      PDM_n <= ~AgteB;				// PDM inverse
+   else if(AgteB)begin
+      PDM <= 1;
+      PDM_n <= 0;				// PDM inverse
+   end else if (!AgteB) begin
+      PDM <= 0;
+      PDM_n <= 1;
    end
 end
 

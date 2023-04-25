@@ -3,7 +3,7 @@ module EQ_engine(clk, rst_n, aud_in_lft, aud_in_rght, vld, POT_LP, POT_B1,
 
 	input rst_n, clk, vld;
 	input [15:0] aud_in_lft, aud_in_rght;
-	input [11:0 ] POT_LP, POT_B1, POT_B2, POT_B3, POT_HP, POT_VOL;
+	input [11:0] POT_LP, POT_B1, POT_B2, POT_B3, POT_HP, POT_VOL;
 	output signed [15:0] aud_out_lft, aud_out_rght;
 	logic sequencing_l, sequencing_h;
 
@@ -111,7 +111,9 @@ module EQ_engine(clk, rst_n, aud_in_lft, aud_in_rght, vld, POT_LP, POT_B1,
 		end
 	end
 
-	assign aud_out_lft = VOL * sum_lft;
-	assign aud_out_rght = VOL * sum_rght;
-
+	logic [28:0] aud_out_lft_temp, aud_out_rght_temp;
+	assign aud_out_lft_temp = VOL * sum_lft;
+	assign aud_out_rght_temp = VOL * sum_rght;
+	assign aud_out_lft = aud_out_lft_temp[27:12];
+	assign aud_out_rght = aud_out_rght_temp[27:12];
 endmodule
