@@ -1,25 +1,30 @@
-module PDM_decoder(clk, rst_n, lft_PDM, rght_PDM, lft_input, rght_input);
+module PDM_decoder(clk, rst_n, lft_PDM, rght_PDM, lft_inverse, rght_inverse);
     input clk, rst_n, lft_PDM, rght_PDM;
-    output logic [15:0] lft_input, rght_input;
+    output logic [15:0] lft_inverse, rght_inverse;
+   logic[15:0] accum_lft, accum_rght;  
 
-    logic[13:0] timer;
-    logic next_accum;
-    always_ff @(posedge clk, negedge rst_n) begin: clk_counter
-        if(!rst_n)
+    logic [10:0] timer;
+
+    always_ff @(posedge clk, negedge rst_n) begin
+        if(!rst_n) begin
             timer <= 0;
-        else
+        end
+        else if(timer == 11'd1152) begin
+            timer <= 0;
+        end
+        else begin
             timer <= timer + 1;
+        end
     end
-    assign next_accum = & timer;
 
-    logic[15:0] accum_lft, accum_rght;
+
     always_ff @(posedge clk, negedge rst_n) begin: accum_l
         if(!rst_n) begin
             accum_lft <= 0;
-            lft_input <= 0;
+            lft_inverse <= 0;
         end
-        else if(next_accum) begin
-            lft_input <= accum_lft;
+        else if(timer == 11'd1152) begin
+            lft_inverse <= accum_lft;
             accum_lft <= 0;
         end
         else if(lft_PDM)
@@ -28,15 +33,16 @@ module PDM_decoder(clk, rst_n, lft_PDM, rght_PDM, lft_input, rght_input);
 
      always_ff @(posedge clk, negedge rst_n) begin: accum_r
         if(!rst_n)begin
-            rght_input <= 0;
+            rght_inverse <= 0;
             accum_rght <= 0;
         end
-        else if(next_accum) begin
-            rght_input <= accum_rght;
+        else if(timer == 11'd1152) begin
+            rght_inverse <= accum_rght;
             accum_rght <= 0;
         end
         else if(rght_PDM)
             accum_rght<= accum_rght + 1;
+
     end
 
 

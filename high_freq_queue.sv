@@ -72,11 +72,12 @@ module high_freq_queue(clk, rst_n, wrt_smpl, lft_smpl, rght_smpl, lft_out, rght_
     always_ff @(posedge clk, negedge rst_n) begin
 	    if(!rst_n)
 		    end_ptr<=0;
-	    else if(set_end)
-            if((old_ptr + 11'd1020) > 11'd1535)
-		        end_ptr <= old_ptr + 11'd1020 - 11'd1536;
+	    else if(set_end) begin
+            if(old_ptr > 11'd515)
+		        end_ptr <= old_ptr - 11'd516;
             else    
                 end_ptr <= old_ptr + 11'd1020;
+        end
     end
 
     /// Combinational logics
