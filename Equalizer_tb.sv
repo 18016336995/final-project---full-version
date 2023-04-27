@@ -38,32 +38,166 @@ module Equalizer_tb();
 	PDM_decoder iPDM(.clk(clk), .rst_n(RST_n), .lft_PDM(lft_PDM), .lft_inverse(lft_inverse), .rght_PDM(rght_PDM), 
 					.rght_inverse(rght_inverse));	
   
-    logic [31:0] freq_h, freq_l;
+    logic [21:0] freq_h, freq_l;
 	logic [11:0] amp_h, amp_l;
-	wave_analyzer_low iWAVE_l(.clk(clk), .rst_n(RST_n), .lft_inverse, .rght_inverse, .freq(freq_l), .amp(amp_l));
-	wave_analyzer_high iWAVE_h(.clk(clk), .rst_n(RST_n), .lft_inverse, .rght_inverse, .freq(freq_h), .amp(amp_h));
-	initial begin
-		clk = 0;
+	logic reset;
+	wave_analyzer_low iWAVE_l(.clk(clk), .rst_n(RST_n), .lft_inverse, .rght_inverse, .freq(freq_l), .amp(amp_l), .reset);
+	wave_analyzer_high iWAVE_h(.clk(clk), .rst_n(RST_n), .lft_inverse, .rght_inverse, .freq(freq_h), .amp(amp_h), .reset);
+	logic [21:0] seq_LP, seq_B1, seq_B2, seq_B3, seq_HP;
+	logic [11:0] amp_LP, amp_B1, amp_B2, amp_B3, amp_HP;
+
+	always_ff @(posedge clk, negedge RST_n) begin
+		if(!RST_n) begin
+			seq_LP <= 0;
+			seq_B1 <= 0;
+			seq_B2 <= 0;
+			seq_B3 <= 0;
+			seq_HP <= 0;
+			amp_LP <= 0;
+			amp_B1 <= 0;
+			amp_B2 <= 0;
+			amp_B3 <= 0;
+			amp_HP <= 0;
+		end else if(LP !== 0) begin
+			seq_LP <= freq_l;
+			amp_LP <= amp_l;
+		end else if(B1 !== 0) begin
+			seq_B1 <= freq_l;
+			amp_B1 <= amp_l;
+		end else if(B2 !== 0) begin
+			seq_B2 <= freq_h;
+			amp_B2 <= amp_h;
+		end else if(B3 !== 0) begin
+			seq_B3 <= freq_h;
+			amp_B3 <= amp_h;
+		end else if(HP !== 0) begin
+			seq_HP <= freq_h;
+			amp_HP <= amp_h;
+		end
+	end
+
+
+		
+	initial begin 
+		reset = 0;
 		RST_n = 0;
+		clk = 0;
 		next_n = 1;
 		prev_n = 1;
 		Flt_n = 1;
-
 		@(posedge clk);
         @(negedge clk); /// wait one clock cycle
-        RST_n = 1;
+		RST_n = 1;
 
-		// test low pass band, after sequencing started, a low freq wave will be produced
+
+		LP = 12'd2048;
+		B1 = 12'd0;
+		B2 = 12'd0;
+		B3 = 12'd0;
+		HP = 12'd0;
+		VOL = 12'd2048;
+		repeat (4200000) @(posedge clk);
+		reset = 1;
+		@(posedge clk);
+        @(negedge clk);
+		if(LED[7] | LED[6] | LED[5]) begin
+			$display("LED shouldnt be this bright when wave intensity is low");
+			$stop();
+		end
+
+
+		reset = 0;
 		LP = 12'd0;
 		B1 = 12'd2048;
 		B2 = 12'd0;
 		B3 = 12'd0;
 		HP = 12'd0;
+		VOL = 12'd3072;
+		repeat (400000) @(posedge clk);
+		reset = 1;
+		@(posedge clk);
+        @(negedge clk);
+		if(LED[7]) begin
+			$display("LED shouldnt be this bright when wave intensity is low");
+			$stop();
+		end
+
+		reset = 0;
+		LP = 12'd0;
+		B1 = 12'd0;
+		B2 = 12'd2048;
+		B3 = 12'd0;
+		HP = 12'd0;
 		VOL = 12'd4095;
-		repeat (7000000) @(posedge clk);
+		repeat (300000) @(posedge clk);
+		reset = 1;
+		@(posedge clk);
+        @(negedge clk);
 		
+
+		reset = 0;
+		LP = 12'd0;
+		B1 = 12'd0;
+		B2 = 12'd0;
+		B3 = 12'd2048;
+		HP = 12'd0;
+		VOL = 12'd4095;
+		repeat (150000) @(posedge clk);		
+		reset = 1;
+		@(posedge clk);
+        @(negedge clk);
+		
+
+		reset = 0;
+		LP = 12'd0;
+		B1 = 12'd0;
+		B2 = 12'd0;
+		B3 = 12'd0;
+		HP = 12'd2048;
+		VOL = 12'd4095;
+		repeat (100000) @(posedge clk);		
+		@(posedge clk);
+        @(negedge clk);
+		reset = 1;
+		if(!LED[7]) begin
+			$display("LED should be bright when wave intensity is high");
+			$stop();
+		end
+
+		// In our project, we use two wave analyzer to detect the freq and amplitude
+		// freq is detected by detecting the clk cycles between a zero crossing 
+		// and the zero crossing after its next zero crossing
+		// Thus, if we devided 50M by the cycles we get, we can get the frequency
+		// ex. in LP, the min cycles should be 50M/80
+		if(seq_LP < 20'd625000) begin
+			$display("FIR_LP failed to filter a wave with frequency lower than 80hz!");
+			$stop();
+		end
+		if(seq_B1 > 20'd625000 | seq_B1 < 20'd178572) begin
+			$display("FIR_B1 failed to filter a wave with frequency higher than 80hz, while lower than 280hz!");
+			$stop();
+		end
+		if(seq_B2 > 20'd178571 | seq_B2 < 20'd50000) begin
+			$display("FIR_B2 failed to filter a wave with frequency higher than 280hz, whiler lower than 1khz!");
+			$stop();
+		end
+		if(seq_B3 > 20'd50000 | seq_B3 < 20'd13889) begin
+			$display("FIR_B3 failed to filter a wave with frequency higher than 1khz, while lower than 3.6khz");
+			$stop();
+		end
+		if(seq_HP > 20'd13889) begin
+			$display("FIR_HP failed to filter a wave with frequency higher than 3.6hz!");
+			$stop();
+		end
+
+		if(amp_LP > amp_B1 | amp_B1 > amp_B2) begin
+			$display("The amplitude does not increase when vol is increased");
+			$stop();
+		end
+		$display("yahoo!");
 		$stop();
 	end
+		
 
 	always
 		#5 clk = ~ clk;

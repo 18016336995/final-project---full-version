@@ -33,12 +33,7 @@ module Equalizer(clk,RST_n,LED,ADC_SS_n,ADC_MOSI,ADC_SCLK,ADC_MISO,
 	wire signed [15:0] lft_chnnl_out, rght_chnnl_out;
 	wire vld, seq_low;
 	
-
-	  
-	assign LED = {8'h00};
-
-		 
-
+		
 	/////////////////////////////////////
 	// Instantiate Reset synchronizer //
 	///////////////////////////////////
@@ -75,7 +70,7 @@ module Equalizer(clk,RST_n,LED,ADC_SS_n,ADC_MOSI,ADC_SCLK,ADC_MISO,
 			      .aud_in_rght(rght_chnnl_in[23:8]),.aud_out_rght(rght_chnnl_out),
 			      .vld(vld));
 				  
-	//iLED(.clk(clk),.rst_n(rst_n),.lft(lft_chnnl_out),.rht(rght_chnnl_out),.LED(LED));
+	LED_drv iLED(.clk(clk),.rst_n(rst_n),.lft_chnnl(lft_chnnl_out),.rght_chnnl(rght_chnnl_out),.LED(LED), .vld);
 
 	/////////////////////////////////////
 	// Instantiate PDM speaker driver //
