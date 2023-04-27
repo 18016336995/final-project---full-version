@@ -33,6 +33,8 @@ module Equalizer(clk,RST_n,LED,ADC_SS_n,ADC_MOSI,ADC_SCLK,ADC_MISO,
 	wire signed [15:0] lft_chnnl_out, rght_chnnl_out;
 	wire vld, seq_low;
 	logic rst_n;
+
+	///assign LED = 8'b0;
 		
 	/////////////////////////////////////
 	// Instantiate Reset synchronizer //

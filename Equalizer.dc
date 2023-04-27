@@ -1,0 +1,78 @@
+#############################################################################################
+######### import the desisgn from current direc
+
+read_file -format sverilog { A2D_intf.sv A2D_with_Pots.sv ADC128S.sv band_scale.sv BT_intf.sv \
+EQ_engine.sv Equalizer.sv FIR_B1.sv FIR_B2.sv FIR_B3.sv FIR_HP.sv FIR_LP.sv high_freq_queue.sv \
+I2S_Mnrch.sv I2S_Serf.sv LED_drv.sv low_freq_queue.sv PB_release.sv PDM.sv PDM_decoder.sv \
+RN52.sv ROM.sv rst_synch.sv slide_intf.sv snd_cmd.sv SPI_ADC128S.sv SPI_mnrch.sv spkr_drv.sv \
+UART.sv }
+
+read_file -format verilog { cmdROM.v dualPort1024x16.v dualPort1536x16.v resp_ROM.v \
+ROM_B1.v ROM_B2.v ROM_B3.v ROM_HP.v ROM_LP.v tone_ROM_lft.v tone_ROM_rght.v }
+
+set current_design Equalizer
+
+link
+
+############################ Define clock and set don't mess with it ###########################
+create_clock -name "clk" -period 3 clk
+
+set_dont_touch_network [find port clk]
+
+set_dont_touch [find design dualPort1024x16]
+
+set_dont_touch [find design dualPort1536x16]
+
+set_dont_touch [find design ROM_B1]
+
+set_dont_touch [find design ROM_B2]
+
+set_dont_touch [find design ROM_B3]
+
+set_dont_touch [find design ROM_HP]
+
+set_dont_touch [find design ROM_LP]
+
+set_dont_touch [find design cmdROM]
+
+set_dont_touch_network [get_net iRST/rst_n]
+
+set prim_inputs [remove_from_collection [all_inputs] [find port clk]]
+
+set_input_delay -clock clk 0.75 [copy_collection $prim_inputs]
+
+########################## Set input delay & drive on all inputs ##################################
+set_driving_cell -lib_cell NAND2X1_LVT -library saed32lvt_tt0p85v25c [copy_collection $prim_inputs]
+
+
+##########################################
+# Set output delay & load on all outputs #
+##########################################
+set_output_delay -clock clk 0.75 [all_outputs]
+
+set_load 0.05 [all_outputs]
+
+set_max_transition 0.125 [current_design]
+
+set_wire_load_model -name 16000 -library saed32lvt_tt0p85v25c
+
+set_clock_uncertainty 0.125 clk
+
+########################################
+# Now actually synthesize for 1st time #
+########################################
+compile -map_effort low
+
+ungroup -all -flatten
+
+compile -map_effort low
+
+######################### Take a look at max & min timings ########################
+report_timing -delay min -nworst 1
+
+report_timing -delay max -nworst 1
+
+report_area > Equalizer_area.txt
+
+#### write out final netlist ######
+write -format verilog Equalizer -output Equalizer.vg

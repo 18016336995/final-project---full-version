@@ -93,11 +93,11 @@ module Equalizer_tb();
 
 
 		LP = 12'd2048;
-		B1 = 12'd0;
-		B2 = 12'd0;
-		B3 = 12'd0;
-		HP = 12'd0;
-		VOL = 12'd2048;
+		B1 = 12'd2048;
+		B2 = 12'd2048;
+		B3 = 12'd2048;
+		HP = 12'd2048;
+		VOL = 12'd1024;
 		repeat (4200000) @(posedge clk);
 		reset = 1;
 		@(posedge clk);
@@ -109,12 +109,12 @@ module Equalizer_tb();
 
 
 		reset = 0;
-		LP = 12'd0;
+		LP = 12'd2048;
 		B1 = 12'd2048;
-		B2 = 12'd0;
-		B3 = 12'd0;
-		HP = 12'd0;
-		VOL = 12'd3072;
+		B2 = 12'd2048;
+		B3 = 12'd2048;
+		HP = 12'd2048;
+		VOL = 12'd2048;
 		repeat (400000) @(posedge clk);
 		reset = 1;
 		@(posedge clk);
@@ -125,12 +125,12 @@ module Equalizer_tb();
 		end
 
 		reset = 0;
-		LP = 12'd0;
-		B1 = 12'd0;
+		LP = 12'd2048;
+		B1 = 12'd2048;
 		B2 = 12'd2048;
-		B3 = 12'd0;
-		HP = 12'd0;
-		VOL = 12'd4095;
+		B3 = 12'd2048;
+		HP = 12'd2048;
+		VOL = 12'd3072;
 		repeat (300000) @(posedge clk);
 		reset = 1;
 		@(posedge clk);
