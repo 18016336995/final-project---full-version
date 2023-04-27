@@ -29,6 +29,9 @@ module EQ_engine(clk, rst_n, aud_in_lft, aud_in_rght, vld, POT_LP, POT_B1,
 		end
 	end
 
+
+	assign seq_low = sequencing_l;
+	assign seq_high = sequencing_h;
 	// initiate low and high queue
 	logic [15:0] low_out_lft, low_out_rght, high_out_lft, high_out_rght;
 	low_freq_queue iDUT_l(.clk(clk), .rst_n(rst_n), .wrt_smpl(vld_low), .lft_smpl(aud_in_lft),

@@ -38,9 +38,10 @@ module Equalizer_tb();
 	PDM_decoder iPDM(.clk(clk), .rst_n(RST_n), .lft_PDM(lft_PDM), .lft_inverse(lft_inverse), .rght_PDM(rght_PDM), 
 					.rght_inverse(rght_inverse));	
   
-    logic [15:0] freq;
-	logic [11:0] amp;
-	wave_analyzer iWAVE(.clk(clk), .rst_n(RST_n), .lft_inverse, .rght_inverse, .freq, .amp);
+    logic [31:0] freq_h, freq_l;
+	logic [11:0] amp_h, amp_l;
+	wave_analyzer_low iWAVE_l(.clk(clk), .rst_n(RST_n), .lft_inverse, .rght_inverse, .freq(freq_l), .amp(amp_l));
+	wave_analyzer_high iWAVE_h(.clk(clk), .rst_n(RST_n), .lft_inverse, .rght_inverse, .freq(freq_h), .amp(amp_h));
 	initial begin
 		clk = 0;
 		RST_n = 0;
@@ -51,19 +52,20 @@ module Equalizer_tb();
 		@(posedge clk);
         @(negedge clk); /// wait one clock cycle
         RST_n = 1;
-		LP = 12'd2048;
-		B1 = 12'd0;
+
+		// test low pass band, after sequencing started, a low freq wave will be produced
+		LP = 12'd0;
+		B1 = 12'd2048;
 		B2 = 12'd0;
 		B3 = 12'd0;
 		HP = 12'd0;
-		VOL = 12'd2048;
-		repeat (3000000) @(posedge clk);
-		
+		VOL = 12'd4095;
+		repeat (7000000) @(posedge clk);
 		
 		$stop();
 	end
 
 	always
-		#10 clk = ~ clk;
+		#5 clk = ~ clk;
   
 endmodule	  

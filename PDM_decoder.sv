@@ -9,7 +9,7 @@ module PDM_decoder(clk, rst_n, lft_PDM, rght_PDM, lft_inverse, rght_inverse);
         if(!rst_n) begin
             timer <= 0;
         end
-        else if(timer == 11'd1152) begin
+        else if(timer == 11'd1133) begin
             timer <= 0;
         end
         else begin
@@ -18,12 +18,12 @@ module PDM_decoder(clk, rst_n, lft_PDM, rght_PDM, lft_inverse, rght_inverse);
     end
 
 
-    always_ff @(posedge clk, negedge rst_n) begin: accum_l
+    always @(posedge clk, negedge rst_n) begin: accum_l
         if(!rst_n) begin
             accum_lft <= 0;
             lft_inverse <= 0;
         end
-        else if(timer == 11'd1152) begin
+        else if(timer == 11'd1133) begin
             lft_inverse <= accum_lft;
             accum_lft <= 0;
         end
@@ -36,7 +36,7 @@ module PDM_decoder(clk, rst_n, lft_PDM, rght_PDM, lft_inverse, rght_inverse);
             rght_inverse <= 0;
             accum_rght <= 0;
         end
-        else if(timer == 11'd1152) begin
+        else if(timer == 11'd1133) begin
             rght_inverse <= accum_rght;
             accum_rght <= 0;
         end
