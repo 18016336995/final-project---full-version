@@ -33,7 +33,6 @@ snd_cmd iDUT2(.cmd_start(cmd_start), .send(send), .cmd_len(cmd_len),
 always_ff @(posedge clk, negedge rst_n) begin
     if(!rst_n) begin
         state <= IDLE;
-		counter <= '1;
     end
     else begin
         state <= nxt_state;

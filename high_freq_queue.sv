@@ -45,7 +45,7 @@ module high_freq_queue(clk, rst_n, wrt_smpl, lft_smpl, rght_smpl, lft_out, rght_
         end
     end
 
-    always @(posedge first) begin : queue_full
+    always_ff @(posedge clk) begin : queue_full
         if(first)
             full = 1;
     end

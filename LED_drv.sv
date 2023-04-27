@@ -21,7 +21,7 @@ module LED_drv(clk, rst_n, vld, lft_chnnl, rght_chnnl, LED);
             if (vld) begin
                 // calculate RMS value
                 sum <= (lft_chnnl * lft_chnnl + rght_chnnl * rght_chnnl);
-                inten <= $sqrt(sum/2);
+                inten <= sqrt(sum/2);
             end
         end
     end
@@ -38,6 +38,24 @@ module LED_drv(clk, rst_n, vld, lft_chnnl, rght_chnnl, LED);
     assign LED[6] = (inten > 16'h0c00) ? 1 : 0;
     assign LED[7] = (inten > 16'h0e00) ? 1 : 0;
     
-
+    function [15:0] sqrt(input [31:0] data);
+        logic [15:0] temp;
+        logic signed [31:0] remain;
+        if(data == 0)
+            sqrt = 0;
+        else begin
+            temp = 1000;
+            repeat (32) begin
+                remain = data - (temp * temp);
+                if (remain >= 0) begin
+                    temp += (remain / (temp << 1));
+                end else begin
+                    temp /= 2;
+                end
+            end
+            sqrt = temp;
+        end
+        
+    endfunction
 
 endmodule

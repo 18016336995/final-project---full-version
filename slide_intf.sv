@@ -23,35 +23,35 @@ module slide_intf(POT_LP, POT_B1, POT_B2, POT_B3, POT_HP, POT_VOL, SS_n, SCLK, M
 
     always_ff @(posedge clk, negedge rst_n) begin: B1
         if(!rst_n)
-            POT_LP <= 0;
+            POT_B1 <= 0;
         else if(en_B1)
             POT_B1 <= res;//if enabled, pass res to B1
     end
 
     always_ff @(posedge clk, negedge rst_n) begin: B2
         if(!rst_n)
-            POT_LP <= 0;
+            POT_B2 <= 0;
         else if(en_B2)
             POT_B2 <= res;//if enabled, pass res to B2
     end
 
     always_ff @(posedge clk, negedge rst_n) begin: B3
         if(!rst_n)
-            POT_LP <= 0;
+            POT_B3 <= 0;
         else if(en_B3)
             POT_B3 <= res;//if enabled, pass res to B3
     end   
 
     always_ff @(posedge clk, negedge rst_n) begin: HP
         if(!rst_n)
-            POT_LP <= 0;
+            POT_HP <= 0;
         else if(en_HP)
             POT_HP <= res;//if enabled, pass res to HP
     end  
 
     always_ff @(posedge clk, negedge rst_n) begin: VOL
         if(!rst_n)
-            POT_LP <= 0;
+            POT_VOL <= 0;
         else if(en_VOL)
             POT_VOL <= res;//if enabled, pass res to VOL
     end

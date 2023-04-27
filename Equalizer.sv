@@ -32,7 +32,7 @@ module Equalizer(clk,RST_n,LED,ADC_SS_n,ADC_MOSI,ADC_SCLK,ADC_MISO,
 	wire signed [23:0] lft_chnnl_in, rght_chnnl_in;
 	wire signed [15:0] lft_chnnl_out, rght_chnnl_out;
 	wire vld, seq_low;
-	
+	logic rst_n;
 		
 	/////////////////////////////////////
 	// Instantiate Reset synchronizer //
@@ -91,7 +91,7 @@ module Equalizer(clk,RST_n,LED,ADC_SS_n,ADC_MOSI,ADC_SCLK,ADC_MISO,
 		end else begin
 	    	time_cnt <= time_cnt + 1;
 			if(!Flt_n)
- 				sht_dwn_temp = 1;
+ 				sht_dwn_temp <= 1;
 			if(time_cnt == 18'd250000) begin
  				sht_dwn_temp <= 0;
  				time_cnt <= 0;

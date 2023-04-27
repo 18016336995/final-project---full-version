@@ -1,3 +1,5 @@
+
+
 module Equalizer_tb();
 
 	reg clk,RST_n;
