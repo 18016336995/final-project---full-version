@@ -68,9 +68,9 @@ ungroup -all -flatten
 compile -map_effort low
 
 ######################### Take a look at max & min timings ########################
-report_timing -delay min -nworst 1
+report_timing -path full -delay min -nworst 3
 
-report_timing -delay max -nworst 1
+report_timing -path full -delay max -nworst 3
 
 report_area > Equalizer_area.txt
 

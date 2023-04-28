@@ -12,23 +12,24 @@ module PB_release
 
 
 // Declare internal signals  
-logic PB1, PB2, PB3;
+logic PB1, PB2, PB3, PB4;
 
 // Sequential logic of 3 FFs to pipeline PB
 always_ff @(posedge clk, negedge rst_n) begin
    if (!rst_n) begin
-      {PB1, PB2, PB3} <= 3'b111;
+      {PB1, PB2, PB3, PB4} <= 4'b1111;
    end
    else begin
       PB1 <= PB;
       PB2 <= PB1;
       PB3 <= PB2;
+      PB4 <= PB3
    end
 end
 
 
 // Gate-level implementation to detect posedge PB  
-and and0(released, PB2, ~PB3);
+and and0(released, PB3, ~PB4);
 
 
 endmodule

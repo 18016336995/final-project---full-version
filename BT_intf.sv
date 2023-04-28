@@ -12,14 +12,17 @@ typedef enum logic [2:0] {IDLE,START,SET,  WAIT,SEND} state_t;
     state_t state, nxt_state;
 logic start_count;
 logic [16:0] counter;
-logic finish;
+logic finish, finish_temp;
+
 always_ff @(posedge clk, negedge rst_n) begin
-	if(!rst_n)
+	if(!rst_n) 
 		counter <= '1;
 	else 
 		counter <= counter - 1;
 end
-assign finish = ~(|counter);
+
+assign finish_temp = ~(|counter);
+buf(finish, finish_temp);
 	
 logic released_n, released_p, send, resp_rcvd;
 logic [4:0] cmd_start;
