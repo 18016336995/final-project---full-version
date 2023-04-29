@@ -3,7 +3,7 @@
 
 read_file -format sverilog { A2D_intf.sv A2D_with_Pots.sv ADC128S.sv band_scale.sv BT_intf.sv \
 EQ_engine.sv Equalizer.sv FIR_B1.sv FIR_B2.sv FIR_B3.sv FIR_HP.sv FIR_LP.sv high_freq_queue.sv \
-I2S_Mnrch.sv I2S_Serf.sv LED_drv.sv low_freq_queue.sv PB_release.sv PDM.sv PDM_decoder.sv \
+I2S_Mnrch.sv I2S_Serf.sv low_freq_queue.sv PB_release.sv PDM.sv PDM_decoder.sv \
 RN52.sv ROM.sv rst_synch.sv slide_intf.sv snd_cmd.sv SPI_ADC128S.sv SPI_mnrch.sv spkr_drv.sv \
 UART.sv }
 
@@ -68,9 +68,9 @@ ungroup -all -flatten
 compile -map_effort low
 
 ######################### Take a look at max & min timings ########################
-report_timing -path full -delay min -nworst 3
+report_timing -delay min -nworst 1
 
-report_timing -path full -delay max -nworst 3
+report_timing -delay max -nworst 1
 
 report_area > Equalizer_area.txt
 

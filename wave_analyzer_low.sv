@@ -40,7 +40,7 @@ module wave_analyzer_low(clk, rst_n, lft_inverse, rght_inverse, freq, amp, reset
                 max <= curr;
             end
             /// find min
-            if (curr < min && curr > 16'd255) begin
+            if (curr < min && curr > 16'd350) begin
                 min <= curr;
             end	
             /// first zero

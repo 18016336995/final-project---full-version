@@ -13,12 +13,15 @@ module rst_synch
 logic intmd;				// intermediate signal between 2 FFs
 
 always_ff @(negedge clk, negedge RST_n) begin
-   if (!RST_n) 
+   if (!RST_n) begin
+      rst_n <= 1'b0;
       intmd <= 1'b0;
-   else 
+   end
+   else begin
       intmd <= 1'b1;
+      rst_n <= intmd;
+   end
 end
 
-buf(rst_n, intmd);
 
 endmodule

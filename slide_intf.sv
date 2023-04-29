@@ -8,7 +8,6 @@ module slide_intf(POT_LP, POT_B1, POT_B2, POT_B3, POT_HP, POT_VOL, SS_n, SCLK, M
     logic [2:0] chnnl, cmplt_counter;
     logic strt_cnv, cnv_cmplt;
     logic en_LP, en_B1, en_B2, en_B3, en_HP, en_VOL; // enable logic for outputing the POT
-    logic [11:0] POT_LP_temp, POT_B1_temp, POT_B2_temp, POT_B3_temp, POT_HP_temp, POT_VOL_temp;
 
     //initiate A2D_intf
     A2D_intf iA2D(.chnnl(chnnl), .strt_cnv(strt_cnv), .clk(clk), .rst_n(rst_n), .MISO(MISO), 
@@ -17,52 +16,46 @@ module slide_intf(POT_LP, POT_B1, POT_B2, POT_B3, POT_HP, POT_VOL, SS_n, SCLK, M
     //set up 6 flops for POT output
     always_ff @(posedge clk, negedge rst_n) begin: LP
         if(!rst_n)
-            POT_LP_temp <= 0;
+            POT_LP <= 0;
         else if(en_LP)
-            POT_LP_temp <= res;//if enabled, pass res to LP
+            POT_LP <= res;//if enabled, pass res to LP
     end
 
     always_ff @(posedge clk, negedge rst_n) begin: B1
         if(!rst_n)
-            POT_B1_temp <= 0;
+            POT_B1 <= 0;
         else if(en_B1)
-            POT_B1_temp <= res;//if enabled, pass res to B1
+            POT_B1 <= res;//if enabled, pass res to B1
     end
 
     always_ff @(posedge clk, negedge rst_n) begin: B2
         if(!rst_n)
-            POT_B2_temp <= 0;
+            POT_B2 <= 0;
         else if(en_B2)
-            POT_B2_temp <= res;//if enabled, pass res to B2
+            POT_B2 <= res;//if enabled, pass res to B2
     end
 
     always_ff @(posedge clk, negedge rst_n) begin: B3
         if(!rst_n)
-            POT_B3_temp <= 0;
+            POT_B3 <= 0;
         else if(en_B3)
-            POT_B3_temp <= res;//if enabled, pass res to B3
+            POT_B3 <= res;//if enabled, pass res to B3
     end   
 
     always_ff @(posedge clk, negedge rst_n) begin: HP
         if(!rst_n)
-            POT_HP_temp <= 0;
+            POT_HP <= 0;
         else if(en_HP)
-            POT_HP_temp <= res;//if enabled, pass res to HP
+            POT_HP <= res;//if enabled, pass res to HP
     end  
 
     always_ff @(posedge clk, negedge rst_n) begin: VOL
         if(!rst_n)
-            POT_VOL_temp <= 0;
+            POT_VOL <= 0;
         else if(en_VOL)
-            POT_VOL_temp <= res;//if enabled, pass res to VOL
+            POT_VOL <= res;//if enabled, pass res to VOL
     end
 
-    assign POT_B1 = POT_B1_temp;
-    assign POT_B2 = POT_B2_temp;
-    assign POT_B3 = POT_B3_temp;
-    assign POT_HP = POT_HP_temp;
-    assign POT_LP = POT_LP_temp;
-    assign POT_VOL = POT_VOL_temp;
     
     //initialize an eight state state machine for transmitting
     typedef enum logic[3:0] {IDLE,START, CHANNEL1,CHANNEL2,CHANNEL3,CHANNEL4,CHANNEL5,CHANNEL6} state_t;

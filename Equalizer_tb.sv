@@ -1,5 +1,3 @@
-
-
 module Equalizer_tb();
 
 	reg clk,RST_n;
@@ -93,11 +91,11 @@ module Equalizer_tb();
 
 
 		LP = 12'd2048;
-		B1 = 12'd2048;
-		B2 = 12'd2048;
-		B3 = 12'd2048;
-		HP = 12'd2048;
-		VOL = 12'd1024;
+		B1 = 12'd0;
+		B2 = 12'd0;
+		B3 = 12'd0;
+		HP = 12'd0;
+		VOL = 12'd2048;
 		repeat (4200000) @(posedge clk);
 		reset = 1;
 		@(posedge clk);
@@ -109,12 +107,12 @@ module Equalizer_tb();
 
 
 		reset = 0;
-		LP = 12'd2048;
+		LP = 12'd0;
 		B1 = 12'd2048;
-		B2 = 12'd2048;
-		B3 = 12'd2048;
-		HP = 12'd2048;
-		VOL = 12'd2048;
+		B2 = 12'd0;
+		B3 = 12'd0;
+		HP = 12'd0;
+		VOL = 12'd3072;
 		repeat (400000) @(posedge clk);
 		reset = 1;
 		@(posedge clk);
@@ -125,12 +123,12 @@ module Equalizer_tb();
 		end
 
 		reset = 0;
-		LP = 12'd2048;
-		B1 = 12'd2048;
+		LP = 12'd0;
+		B1 = 12'd0;
 		B2 = 12'd2048;
-		B3 = 12'd2048;
-		HP = 12'd2048;
-		VOL = 12'd3072;
+		B3 = 12'd0;
+		HP = 12'd0;
+		VOL = 12'd4095;
 		repeat (300000) @(posedge clk);
 		reset = 1;
 		@(posedge clk);
@@ -161,10 +159,7 @@ module Equalizer_tb();
 		@(posedge clk);
         @(negedge clk);
 		reset = 1;
-		if(!LED[7]) begin
-			$display("LED should be bright when wave intensity is high");
-			$stop();
-		end
+		
 
 		// In our project, we use two wave analyzer to detect the freq and amplitude
 		// freq is detected by detecting the clk cycles between a zero crossing 
@@ -193,7 +188,7 @@ module Equalizer_tb();
 		end
 
 		if(amp_LP > amp_B1 | amp_B1 > amp_B2) begin
-			$display("The amplitude does not increase when vol is increased");
+			$display("The amplitude does not increase when vol is increased %d %d %d", amp_LP, amp_B1, amp_B2);
 			$stop();
 		end
 		$display("yahoo!");

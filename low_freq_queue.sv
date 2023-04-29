@@ -33,8 +33,10 @@ module low_freq_queue(clk, rst_n, wrt_smpl, lft_smpl, rght_smpl, lft_out, rght_o
     end
 
     // once the queue is full, assert full forever
-    always_ff @(posedge clk) begin : queue_full
-        if(first)
+    always_ff @(posedge clk, negedge rst_n) begin : queue_full
+        if(!rst_n) 
+            full <= 0;
+        else if(first)
             full = 1;
     end
     assign first = (new_ptr == 10'd1021);
