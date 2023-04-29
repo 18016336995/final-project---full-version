@@ -1,4 +1,3 @@
-`timescale 1ns/1ps
 module Equalizer_tb();
 
 	reg clk,RST_n;
@@ -101,7 +100,7 @@ module Equalizer_tb();
 		reset = 1;
 		@(posedge clk);
         @(negedge clk);
-		
+
 
 
 		reset = 0;
@@ -115,7 +114,8 @@ module Equalizer_tb();
 		reset = 1;
 		@(posedge clk);
         @(negedge clk);
-		
+
+
 		reset = 0;
 		LP = 12'd0;
 		B1 = 12'd0;
@@ -191,6 +191,6 @@ module Equalizer_tb();
 		
 
 	always
-		#2 clk = ~ clk;
+		#5 clk = ~ clk;
   
 endmodule	  

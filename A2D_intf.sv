@@ -91,8 +91,6 @@ always_comb begin
 	    nxt_state = IDLE;
 	 end
       end
-      // default state to IDLE
-      default: nxt_state = IDLE;
    endcase
 end
 

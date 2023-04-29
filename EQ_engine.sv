@@ -29,9 +29,6 @@ module EQ_engine(clk, rst_n, aud_in_lft, aud_in_rght, vld, POT_LP, POT_B1,
 		end
 	end
 
-
-	assign seq_low = sequencing_l;
-	assign seq_high = sequencing_h;
 	// initiate low and high queue
 	logic [15:0] low_out_lft, low_out_rght, high_out_lft, high_out_rght;
 	low_freq_queue iDUT_l(.clk(clk), .rst_n(rst_n), .wrt_smpl(vld_low), .lft_smpl(aud_in_lft),
@@ -57,16 +54,16 @@ module EQ_engine(clk, rst_n, aud_in_lft, aud_in_rght, vld, POT_LP, POT_B1,
 	// initiate 10 band scale ports for each FIR output
 	logic signed [15:0] band_LP_lft, band_LP_rght, band_B1_lft, band_B1_rght, band_B2_lft, band_B2_rght, 
 			band_B3_lft, band_B3_rght, band_HP_lft, band_HP_rght;
-	band_scale iDUT_LP_lft(.POT(POT_LP), .audio(LP_lft), .scaled(band_LP_lft));
-	band_scale iDUT_LP_rght(.POT(POT_LP), .audio(LP_rght), .scaled(band_LP_rght));
-	band_scale iDUT_B1_lft(.POT(POT_B1), .audio(B1_lft), .scaled(band_B1_lft));
-	band_scale iDUT_B1_rght(.POT(POT_B1), .audio(B1_rght), .scaled(band_B1_rght));
-	band_scale iDUT_B2_lft(.POT(POT_B2), .audio(B2_lft), .scaled(band_B2_lft));
-	band_scale iDUT_B2_rght(.POT(POT_B2), .audio(B2_rght), .scaled(band_B2_rght));
-	band_scale iDUT_B3_lft(.POT(POT_B3), .audio(B3_lft), .scaled(band_B3_lft));
-	band_scale iDUT_B3_rght(.POT(POT_B3), .audio(B3_rght), .scaled(band_B3_rght));
-	band_scale iDUT_HP_lft(.POT(POT_HP), .audio(HP_lft), .scaled(band_HP_lft));
-	band_scale iDUT_HP_rght(.POT(POT_HP), .audio(HP_rght), .scaled(band_HP_rght));
+	band_scale iDUT_LP_lft(.POT(POT_LP), .audio(LP_lft), .scaled(band_LP_lft), .clk(clk), .rst_n(rst_n));
+	band_scale iDUT_LP_rght(.POT(POT_LP), .audio(LP_rght), .scaled(band_LP_rght), .clk(clk), .rst_n(rst_n));
+	band_scale iDUT_B1_lft(.POT(POT_B1), .audio(B1_lft), .scaled(band_B1_lft), .clk(clk), .rst_n(rst_n));
+	band_scale iDUT_B1_rght(.POT(POT_B1), .audio(B1_rght), .scaled(band_B1_rght), .clk(clk), .rst_n(rst_n));
+	band_scale iDUT_B2_lft(.POT(POT_B2), .audio(B2_lft), .scaled(band_B2_lft), .clk(clk), .rst_n(rst_n));
+	band_scale iDUT_B2_rght(.POT(POT_B2), .audio(B2_rght), .scaled(band_B2_rght), .clk(clk), .rst_n(rst_n));
+	band_scale iDUT_B3_lft(.POT(POT_B3), .audio(B3_lft), .scaled(band_B3_lft), .clk(clk), .rst_n(rst_n));
+	band_scale iDUT_B3_rght(.POT(POT_B3), .audio(B3_rght), .scaled(band_B3_rght), .clk(clk), .rst_n(rst_n));
+	band_scale iDUT_HP_lft(.POT(POT_HP), .audio(HP_lft), .scaled(band_HP_lft), .clk(clk), .rst_n(rst_n));
+	band_scale iDUT_HP_rght(.POT(POT_HP), .audio(HP_rght), .scaled(band_HP_rght), .clk(clk), .rst_n(rst_n));
 
 	logic signed [15:0] band_LP_lft_f, band_LP_rght_f, band_B1_lft_f, band_B1_rght_f, band_B2_lft_f, band_B2_rght_f, 
 			band_B3_lft_f, band_B3_rght_f, band_HP_lft_f, band_HP_rght_f;
@@ -109,13 +106,10 @@ module EQ_engine(clk, rst_n, aud_in_lft, aud_in_rght, vld, POT_LP, POT_B1,
 		else begin
 			sum_lft <= band_B1_lft_f + band_B2_lft_f + band_B3_lft_f
 							+ band_LP_lft_f + band_HP_lft_f;
-			sum_rght <=  band_B1_rght_f + band_B2_rght_f + band_B3_rght_f
+			sum_rght <= band_B1_rght_f + band_B2_rght_f + band_B3_rght_f
 							+ band_LP_rght_f + band_HP_rght_f;
 		end
 	end
-
-
-
 
 	logic [28:0] aud_out_lft_temp, aud_out_rght_temp;
 	assign aud_out_lft_temp = VOL * sum_lft;
