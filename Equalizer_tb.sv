@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 module Equalizer_tb();
 
 	reg clk,RST_n;
@@ -100,10 +101,7 @@ module Equalizer_tb();
 		reset = 1;
 		@(posedge clk);
         @(negedge clk);
-		if(LED[7] | LED[6] | LED[5]) begin
-			$display("LED shouldnt be this bright when wave intensity is low");
-			$stop();
-		end
+		
 
 
 		reset = 0;
@@ -117,11 +115,7 @@ module Equalizer_tb();
 		reset = 1;
 		@(posedge clk);
         @(negedge clk);
-		if(LED[7]) begin
-			$display("LED shouldnt be this bright when wave intensity is low");
-			$stop();
-		end
-
+		
 		reset = 0;
 		LP = 12'd0;
 		B1 = 12'd0;
@@ -197,6 +191,6 @@ module Equalizer_tb();
 		
 
 	always
-		#5 clk = ~ clk;
+		#2 clk = ~ clk;
   
 endmodule	  

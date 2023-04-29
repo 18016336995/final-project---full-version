@@ -37,7 +37,7 @@ module low_freq_queue(clk, rst_n, wrt_smpl, lft_smpl, rght_smpl, lft_out, rght_o
         if(!rst_n) 
             full <= 0;
         else if(first)
-            full = 1;
+            full <= 1;
     end
     assign first = (new_ptr == 10'd1021);
     

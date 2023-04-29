@@ -18,7 +18,7 @@ always_ff @(negedge clk, negedge RST_n) begin
       intmd <= 1'b0;
    end
    else begin
-      intmd <= 1'b1;
+      intmd <= 1;
       rst_n <= intmd;
    end
 end

@@ -109,10 +109,13 @@ module EQ_engine(clk, rst_n, aud_in_lft, aud_in_rght, vld, POT_LP, POT_B1,
 		else begin
 			sum_lft <= band_B1_lft_f + band_B2_lft_f + band_B3_lft_f
 							+ band_LP_lft_f + band_HP_lft_f;
-			sum_rght <= band_B1_rght_f + band_B2_rght_f + band_B3_rght_f
+			sum_rght <=  band_B1_rght_f + band_B2_rght_f + band_B3_rght_f
 							+ band_LP_rght_f + band_HP_rght_f;
 		end
 	end
+
+
+
 
 	logic [28:0] aud_out_lft_temp, aud_out_rght_temp;
 	assign aud_out_lft_temp = VOL * sum_lft;

@@ -1,98 +1,101 @@
-module BT_intf(next_n, clk, rst_n, prev_n, cmd_n, TX, RX);
-
-input next_n;
-input clk;
-input rst_n;
-input prev_n;
-output logic cmd_n;
-output logic TX;
-input logic RX;
-
-typedef enum logic [2:0] {IDLE,START,SET,  WAIT,SEND} state_t;
-state_t state, nxt_state;
-logic start_count;
-logic [16:0] counter;
-logic finish;
-always_ff @(posedge clk, negedge rst_n) begin
-	if(!rst_n)
-		counter <= '1;
-	else 
-		counter <= counter - 1;
-end
-assign finish = ~(|counter);
+`default_nettype none
+module BT_intf(clk, rst_n, next_n, prev_n, RX, TX, cmd_n);
+	input logic clk, rst_n;
+	input logic next_n, prev_n;
+	input logic RX;
+	output logic TX;
+	output logic cmd_n;
 	
-logic released_n, released_p, send, resp_rcvd;
-logic [4:0] cmd_start;
-logic [3:0] cmd_len;
+	// outputs of state machine
+	logic [4:0] cmd_start;
+	logic send;
+	logic [3:0] cmd_len;
 
-PB_release iDUT0(.PB(next_n), .clk(clk), .rst_n(rst_n), .released(released_n));
-PB_release iDUT1(.PB(prev_n), .clk(clk), .rst_n(rst_n), .released(released_p));
-snd_cmd iDUT2(.cmd_start(cmd_start), .send(send), .cmd_len(cmd_len), 
-	.resp_rcvd(resp_rcvd), .TX(TX), .RX(RX), .clk(clk), .rst_n(rst_n));
+	// inputs of state machine
+	logic resp_rcvd;
+	logic pb1;
+	logic pb2;
+	logic equal_17;
 
-always_ff @(posedge clk, negedge rst_n) begin
-    if(!rst_n) begin
-        state <= IDLE;
-    end
-    else begin
-        state <= nxt_state;
-    end
-end
+	PB_release button1 (.PB(next_n), .clk(clk), .rst_n(rst_n), .released(pb1));
+	PB_release button2 (.PB(prev_n), .clk(clk), .rst_n(rst_n), .released(pb2));
+	snd_cmd iSEND(.clk(clk), .rst_n(rst_n), .cmd_start(cmd_start), .send(send), .cmd_len(cmd_len), .resp_rcvd(resp_rcvd), .RX(RX), .TX(TX));
+	
+	// 17 bit counter
+	logic [16:0] cntr_17, cntr_temp;
+	always_ff @(posedge clk, negedge rst_n)
+		if (!rst_n)
+			cntr_17 <= '0;
+		else if(!equal_17)
+			cntr_17 <= cntr_temp;
+	assign cntr_temp = cntr_17 + 1;
+	assign equal_17 = ~(cntr_17 == '1);
+	
+	// SM
+	typedef enum reg [2:0] {IDLE, WAIT17, INIT1, INIT2, LISTEN} state_t;
+	state_t state, nxt_state;
+	
+	always_ff @(posedge clk, negedge rst_n)
+		if(!rst_n)
+			state <= IDLE;
+		else
+			state <= nxt_state;
 
-always_comb begin
-	send = 0;
-    cmd_start = 5'b00000;
-	cmd_len = 4'b0000;
-	cmd_n = 0;
-    nxt_state = state;
+	always_comb begin
+		// default outputs of SM
+		send = 0;
+		cmd_start = 5'b00000;
+		cmd_len = 4'b0000;
+		cmd_n = 0;
+		nxt_state = state;
 
-    case(state) 
-
-        IDLE: begin
+		case (state)
+			IDLE:
+				if (!equal_17) begin
+					cmd_n = 1;
+					nxt_state = IDLE;
+				end
+				else begin
+					cmd_n = 0;
+					nxt_state = WAIT17;
+				end
 			
-			if(!finish) begin
-				cmd_n = 1;
-				
-			end else begin
-				cmd_n = 0;
-				nxt_state = START;
-			end
-		end
-		START: begin
-			if(resp_rcvd) begin
-				send = 1;
-				cmd_start = 5'b0;
-				cmd_len = 4'd6;
-				nxt_state = SET;
-			end
-		end
-		SET: begin	
-			if(resp_rcvd) begin
-				send = 1;
-				cmd_start = 5'b00110;
-				cmd_len = 4'd10;
-				nxt_state = WAIT;
-			end
-		end
-		WAIT: begin	
-			if(resp_rcvd) begin
-				nxt_state = SEND;
-			end
-		end
-		SEND: begin
-			if(released_n) begin
-				cmd_start = 5'b10000;
-				cmd_len = 4'd4;
-				send = 1;
-			end else if(released_p) begin
-				cmd_start = 5'b10100;
-				cmd_len = 4'd4;
-				send = 1;
-			end
-		end
-    endcase
+			WAIT17:
+				if (resp_rcvd) begin
+					send = 1;
+					cmd_start = 5'b00000;
+					cmd_len = 4'd6;
+					nxt_state = INIT1;
+				end
 
-end
+			INIT1:
+				if (resp_rcvd) begin
+					send = 1;
+					cmd_start = 5'b00110;
+					cmd_len = 4'd10;
+					nxt_state = INIT2;
+				end
 
+			INIT2:
+				if (resp_rcvd)
+					nxt_state = LISTEN;
+
+			default:
+				if (pb1) begin
+					send = 1;
+					cmd_start = 5'b10000;
+					cmd_len = 4'd4;
+					nxt_state = LISTEN;
+				end
+				else if (pb2) begin
+					send = 1;
+					cmd_start = 5'b10100;
+					cmd_len = 4'd4;
+					nxt_state = LISTEN;
+				end
+					
+		endcase
+	end
 
 endmodule
+`default_nettype wire
