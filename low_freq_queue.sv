@@ -48,10 +48,10 @@ module low_freq_queue(clk, rst_n, wrt_smpl, lft_smpl, rght_smpl, lft_out, rght_o
             rd_ptr <= 0;
         end
 	    else if(set_end)begin
-            finish = 0;
+            finish <= 0;
             rd_ptr <= old_ptr; /// initialize to the old pointer
 	    end else if(rd_ptr == end_ptr)
-	            finish = 1;
+	            finish <= 1;
             else if(sequencing)begin //increase rd when sequencing
                 rd_ptr <= rd_ptr + 1;
         end

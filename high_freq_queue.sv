@@ -56,6 +56,7 @@ module high_freq_queue(clk, rst_n, wrt_smpl, lft_smpl, rght_smpl, lft_out, rght_
     always_ff @(posedge clk, negedge rst_n) begin : read_pointer
         if(!rst_n)begin
             rd_ptr <= 0;
+            finish <= 0;
         end
         else if(set_end) begin
             rd_ptr <= old_ptr; /// initialize to the old pointer

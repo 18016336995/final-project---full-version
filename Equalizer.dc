@@ -58,19 +58,22 @@ set_wire_load_model -name 16000 -library saed32lvt_tt0p85v25c
 
 set_clock_uncertainty 0.125 clk
 
+set_fix_hold clk
 ########################################
 # Now actually synthesize for 1st time #
 ########################################
-compile -map_effort low
+compile -map_effort medium
 
 ungroup -all -flatten
 
-compile -map_effort low
+compile -map_effort medium
 
 ######################### Take a look at max & min timings ########################
-report_timing -delay min -nworst 1
 
-report_timing -delay max -nworst 1
+
+report_timing -delay min 
+
+report_timing -delay max
 
 report_area > Equalizer_area.txt
 

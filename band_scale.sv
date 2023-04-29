@@ -1,21 +1,32 @@
-module band_scale(POT, audio, scaled);
+module band_scale(POT, audio, scaled, clk, rst_n);
 	
-input [11:0]POT;
-input signed[15:0]audio;
-output signed[15:0]scaled;
+input clk, rst_n;    
+input [11:0] POT;
+input signed [15:0] audio;
+output signed [15:0] scaled;
 
-logic [23:0]POT_square;
-logic signed[12:0]POT_13;
-logic signed[28:0]result;
+logic [23:0] POT_square;
+logic signed [12:0] POT_13;
+logic signed [28:0] result;
 
 logic sign, smaller, larger, temp, temp1;
-logic signed[15:0]result_out_neg, result_out_pos;
+logic signed [15:0] result_out_neg, result_out_pos;
 
+always_ff @(posedge clk, negedge rst_n) begin
+    if(!rst_n)
+        POT_square <= 0;
+    else
+        POT_square <= POT * POT; // get the square of POT
+end
 
+always_ff @(posedge clk, negedge rst_n) begin
+    if(!rst_n)
+        result <= 0;
+    else
+        result <= audio * POT_13; 
+end
 
-assign POT_square = POT * POT; // get the square of POT
 assign POT_13 = {1'b0, POT_square[23:12]}; // make POT^2 a 13 bit signed value
-assign result = audio * POT_13; 
 assign sign = result[28]; // get the sign of result
 
 or or0(temp,~result[27], ~result[26], ~result[25]); // determine when the result is negative, does it need to be satuated
