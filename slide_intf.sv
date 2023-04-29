@@ -57,12 +57,12 @@ module slide_intf(POT_LP, POT_B1, POT_B2, POT_B3, POT_HP, POT_VOL, SS_n, SCLK, M
             POT_VOL_temp <= res;//if enabled, pass res to VOL
     end
 
-    buf(POT_B1, POT_B1_temp);
-    buf(POT_B2, POT_B2_temp);
-    buf(POT_B3, POT_B3_temp);
-    buf(POT_HP, POT_HP_temp);
-    buf(POT_LP, POT_LP_temp);
-    buf(POT_VOL, POT_VOL_temp);
+    assign POT_B1 = POT_B1_temp;
+    assign POT_B2 = POT_B2_temp;
+    assign POT_B3 = POT_B3_temp;
+    assign POT_HP = POT_HP_temp;
+    assign POT_LP = POT_LP_temp;
+    assign POT_VOL = POT_VOL_temp;
     
     //initialize an eight state state machine for transmitting
     typedef enum logic[3:0] {IDLE,START, CHANNEL1,CHANNEL2,CHANNEL3,CHANNEL4,CHANNEL5,CHANNEL6} state_t;
