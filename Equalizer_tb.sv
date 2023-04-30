@@ -77,7 +77,39 @@ module Equalizer_tb();
 		end
 	end
 
+	task read_wave;
+		input [11:0] LP_temp, B1_temp, B2_temp, B3_temp, HP_temp, VOL_temp;
+		input [31:0] TIME;
+		begin
+			// start to read
+			@(posedge clk);
+       		@(negedge clk);
+			reset = 0;
+			assign LP = LP_temp;
+			assign B1 = B1_temp;
+			assign B2 = B2_temp;
+			assign B3 = B3_temp;
+			assign HP = HP_temp;
+			assign VOL = VOL_temp;
+			repeat (TIME) @(posedge clk);
+			reset = 1;
+		end
+	endtask
 
+	task change_song;
+		input prev_temp, next_temp;
+		begin
+			@(posedge clk);
+			@(negedge clk);		
+			assign next_n = next_temp;
+			assign prev_n = prev_temp;
+			@(posedge clk);
+			@(negedge clk);			
+			assign next_n = 1;
+			assign prev_n = 1;
+			repeat (100000) @(posedge clk);	
+		end
+	endtask
 		
 	initial begin 
 		reset = 0;
@@ -90,93 +122,75 @@ module Equalizer_tb();
         @(negedge clk); /// wait one clock cycle
 		RST_n = 1;
 
-
-		LP = 12'd2048;
-		B1 = 12'd0;
-		B2 = 12'd0;
-		B3 = 12'd0;
-		HP = 12'd0;
-		VOL = 12'd2048;
-		repeat (4200000) @(posedge clk);
+		read_wave(12'd0, 0, 0, 0, 0, 12'd2048, 32'd500000);
 		reset = 1;
-		@(posedge clk);
-        @(negedge clk);
-		
+
+		change_song(1,0);
+		if(iRN52.song !== 1) begin
+			$display("fail to proceed to next song");
+			$stop();
+		end
+
+		change_song(1,0);
+		if(iRN52.song !== 2) begin
+			$display("fail to proceed to next song");
+			$stop();
+		end
 
 
-		reset = 0;
-		LP = 12'd0;
-		B1 = 12'd2048;
-		B2 = 12'd0;
-		B3 = 12'd0;
-		HP = 12'd0;
-		VOL = 12'd3072;
-		repeat (400000) @(posedge clk);
-		reset = 1;
-		@(posedge clk);
-        @(negedge clk);
+		change_song(1,0);
+		if(iRN52.song !== 3) begin
+			$display("fail to proceed to next song");
+			$stop();
+		end
 		
-		reset = 0;
-		LP = 12'd0;
-		B1 = 12'd0;
-		B2 = 12'd2048;
-		B3 = 12'd0;
-		HP = 12'd0;
-		VOL = 12'd4095;
-		repeat (300000) @(posedge clk);
-		reset = 1;
-		@(posedge clk);
-        @(negedge clk);
-		
+		change_song(0,1);
+		change_song(0,1);
+		change_song(0,1);
+		if(iRN52.song !== 0) begin
+			$display("fail to proceed to prev song");
+			$stop();
+		end
 
-		reset = 0;
-		LP = 12'd0;
-		B1 = 12'd0;
-		B2 = 12'd0;
-		B3 = 12'd2048;
-		HP = 12'd0;
-		VOL = 12'd4095;
-		repeat (150000) @(posedge clk);		
-		reset = 1;
-		@(posedge clk);
-        @(negedge clk);
+		read_wave(12'd2048, 0, 0, 0, 0, 12'd2048, 32'd3660000);
 		
+		read_wave(0, 12'd2048, 0, 0, 0, 12'd3072, 32'd500000);
 
-		reset = 0;
-		LP = 12'd0;
-		B1 = 12'd0;
-		B2 = 12'd0;
-		B3 = 12'd0;
-		HP = 12'd2048;
-		VOL = 12'd4095;
-		repeat (100000) @(posedge clk);		
-		@(posedge clk);
-        @(negedge clk);
-		reset = 1;
+		read_wave(0, 0, 12'd2048, 0 , 0, 12'd4095, 32'd180000);
+	
+		read_wave(0, 0, 0, 12'd2048, 0, 12'd4095, 32'd120000);	
 		
+		Flt_n = 0;
+		@(posedge clk);
+		@(negedge clk);
+		Flt_n = 1;
 
+		read_wave(0, 0, 0, 0, 12'd2048, 12'd4095, 32'd90000);	
+		
+		
+		
 		// In our project, we use two wave analyzer to detect the freq and amplitude
 		// freq is detected by detecting the clk cycles between a zero crossing 
 		// and the zero crossing after its next zero crossing
 		// Thus, if we devided 50M by the cycles we get, we can get the frequency
 		// ex. in LP, the min cycles should be 50M/80
-		if(seq_LP < 20'd625000) begin
+		if(seq_LP < 22'd625000) begin
 			$display("FIR_LP failed to filter a wave with frequency lower than 80hz!");
 			$stop();
 		end
-		if(seq_B1 > 20'd625000 | seq_B1 < 20'd178572) begin
+		if(seq_B1 > 22'd625000 | seq_B1 < 22'd178572) begin
 			$display("FIR_B1 failed to filter a wave with frequency higher than 80hz, while lower than 280hz!");
 			$stop();
 		end
-		if(seq_B2 > 20'd178571 | seq_B2 < 20'd50000) begin
+		if(seq_B2 > 22'd178571 | seq_B2 < 22'd50000) begin
 			$display("FIR_B2 failed to filter a wave with frequency higher than 280hz, whiler lower than 1khz!");
 			$stop();
 		end
-		if(seq_B3 > 20'd50000 | seq_B3 < 20'd13889) begin
+		if(seq_B3 > 22'd50000 | seq_B3 < 22'd13889) begin
 			$display("FIR_B3 failed to filter a wave with frequency higher than 1khz, while lower than 3.6khz");
 			$stop();
 		end
-		if(seq_HP > 20'd13889) begin
+		if(seq_HP > 22'd13889) begin
 			$display("FIR_HP failed to filter a wave with frequency higher than 3.6hz!");
 			$stop();
 		end
