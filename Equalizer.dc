@@ -5,7 +5,7 @@ read_file -format sverilog { A2D_intf.sv A2D_with_Pots.sv ADC128S.sv band_scale.
 EQ_engine.sv Equalizer.sv FIR_B1.sv FIR_B2.sv FIR_B3.sv FIR_HP.sv FIR_LP.sv high_freq_queue.sv \
 I2S_Mnrch.sv I2S_Serf.sv LED_drv.sv low_freq_queue.sv PB_release.sv PDM.sv PDM_decoder.sv \
 RN52.sv ROM.sv rst_synch.sv slide_intf.sv snd_cmd.sv SPI_ADC128S.sv SPI_mnrch.sv spkr_drv.sv \
-UART.sv }
+sqrt.sv UART.sv }
 
 read_file -format verilog { cmdROM.v dualPort1024x16.v dualPort1536x16.v resp_ROM.v \
 ROM_B1.v ROM_B2.v ROM_B3.v ROM_HP.v ROM_LP.v tone_ROM_lft.v tone_ROM_rght.v }
