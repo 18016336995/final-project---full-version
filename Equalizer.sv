@@ -70,7 +70,7 @@ module Equalizer(clk,RST_n,LED,ADC_SS_n,ADC_MOSI,ADC_SCLK,ADC_MISO,
 	              .POT_B1(POT_B1),.POT_B2(POT_B2),.POT_B3(POT_B3),.POT_HP(POT_HP),
 			      .aud_in_lft(lft_chnnl_in[23:8]),.aud_out_lft(lft_chnnl_out),
 			      .aud_in_rght(rght_chnnl_in[23:8]),.aud_out_rght(rght_chnnl_out),
-			      .vld(vld));
+			      .vld(vld),.seq_low);
 				  
 	LED_drv iLED(.clk(clk),.rst_n(rst_n),.lft_chnnl(lft_chnnl_out),.rght_chnnl(rght_chnnl_out),.LED(LED), .vld);
 
@@ -84,22 +84,15 @@ module Equalizer(clk,RST_n,LED,ADC_SS_n,ADC_MOSI,ADC_SCLK,ADC_MISO,
 	///////////////////////////////////////////////////////////////
 	// Infer sht_dwn/Flt_n logic or incorporate into other unit //
 	/////////////////////////////////////////////////////////////
-	logic sht_dwn_temp;
-	logic [17:0] time_cnt;
 	always_ff @(posedge clk, negedge rst_n) begin
-		if(!rst_n) begin
-			sht_dwn_temp <= 1;
-			time_cnt <= 0;
-		end else begin
-	    	time_cnt <= time_cnt + 1;
+		if(!rst_n)
+			sht_dwn <= 1;
+		else begin
 			if(!Flt_n)
- 				sht_dwn_temp <= 1;
-			if(time_cnt == 18'd250000) begin
- 				sht_dwn_temp <= 0;
- 				time_cnt <= 0;
-            end
+ 				sht_dwn <= 1;
+			else if(seq_low)
+ 				sht_dwn <= 0;
         end
     end
-    assign sht_dwn = sht_dwn_temp;
 
 endmodule

@@ -1,15 +1,16 @@
 module EQ_engine(clk, rst_n, aud_in_lft, aud_in_rght, vld, POT_LP, POT_B1, 
-    POT_B2, POT_B3, POT_HP, POT_VOL, aud_out_lft, aud_out_rght);
+    POT_B2, POT_B3, POT_HP, POT_VOL, aud_out_lft, aud_out_rght, seq_low);
 
 	input rst_n, clk, vld;
 	input [15:0] aud_in_lft, aud_in_rght;
 	input [11:0] POT_LP, POT_B1, POT_B2, POT_B3, POT_HP, POT_VOL;
 	output signed [15:0] aud_out_lft, aud_out_rght;
+	output seq_low;
 	logic sequencing_l, sequencing_h;
 
 	logic signed [12:0] VOL;
 	assign VOL = {1'b0, POT_VOL};
-
+	assign seq_low = sequencing_l;
 	/// control vld_low signal for low frequency queue, half times as high frequency queue
 	logic vld_low; 
 	logic [1:0] vld_cnt;
